@@ -1,6 +1,8 @@
+const path = require("path");
 const express = require("express");
 const dotenv = require("dotenv");
 const colors = require("colors");
+const fileupload = require("express-fileupload");
 const morgan = require("morgan");
 const connectDB = require("./config/db");
 const errorHandler = require("./middleware/error");
@@ -17,19 +19,25 @@ const courses = require("./routes/courses");
 
 const app = express();
 
-// body parser
+// Body parser
 app.use(express.json());
 
-// dev logging middleware ()
+// Dev logging middleware ()
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
+
+// File uploading
+app.use(fileupload());
+
+// Set static folder (accessible from the web)
+app.use(express.static(path.join(__dirname, "public")));
 
 // Mount routers
 app.use("/api/v1/bootcamps", bootcamps);
 app.use("/api/v1/courses", courses);
 
-// error handling middleware- must be mounted after the bootcamps router
+// Error handling middleware- must be mounted after the bootcamps router
 // if we want to use it with the bootcamps api
 app.use(errorHandler);
 
