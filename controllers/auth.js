@@ -35,12 +35,7 @@ exports.login = asyncHandler(async (req, res, next) => {
   const user = await User.findOne({ email }).select("+password");
 
   if (!user) {
-    return next(
-      new ErrorResponse(
-        "Invalid credentials, pleae enter a registered email and password",
-        401
-      )
-    );
+    return next(new ErrorResponse("Invalid credentials", 401));
   }
 
   // Check if password matches the password stored in database
@@ -62,6 +57,21 @@ exports.getMe = asyncHandler(async (req, res, next) => {
   res.status(200).json({
     success: true,
     data: user,
+  });
+});
+
+// @desc     Log user out / clear cookie
+// @route    GET /api/v1/auth/logout
+// @access   Private
+exports.logout = asyncHandler(async (req, res, next) => {
+  res.cookie("token", "none", {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+  });
+
+  res.status(200).json({
+    success: true,
+    data: {},
   });
 });
 
